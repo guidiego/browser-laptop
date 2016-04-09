@@ -43,6 +43,7 @@ const keytar = require('keytar')
 const settings = require('../js/constants/settings')
 const siteSettings = require('../js/state/siteSettings')
 const spellCheck = require('./spellCheck')
+const path = require('path')
 
 // Used to collect the per window state when shutting down the application
 let perWindowState = []
@@ -60,6 +61,30 @@ let throttleKeytar = false
 
 // Map of password notification bar messages to their callbacks
 const passwordCallbacks = {}
+
+// PepperFlash include
+let pepperVersion = '21.0.0.213'
+let basePepperPath = '../js/plugins/pepperflash/' + pepperVersion + '/_platform_specific/'
+var pepperAdapterPath = ''
+
+switch (process.platform) {
+  case 'win32':
+    pepperAdapterPath = basePepperPath + 'win_x86/pepflashplayer.dll'
+    break
+  case 'win64':
+    pepperAdapterPath = basePepperPath + 'win_x64/pepflashplayer.dll'
+    break
+  case 'linux':
+    pepperAdapterPath = basePepperPath + 'linux/libpepflashplayer.so'
+    break
+  default:
+    pepperAdapterPath = basePepperPath + 'mac_x64/PepperFlashPlayer.plugin'
+    break
+}
+
+const pepperPath = path.join(__dirname, pepperAdapterPath)
+app.commandLine.appendSwitch('ppapi-flash-path', pepperPath)
+app.commandLine.appendSwitch('ppapi-flash-version', pepperVersion)
 
 /**
  * Gets the master key for encrypting login credentials from the OS keyring.

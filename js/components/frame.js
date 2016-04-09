@@ -119,6 +119,9 @@ class Frame extends ImmutableComponent {
     this.webview.setAttribute('data-frame-key', this.props.frame.get('key'))
     this.webview.setAttribute('useragent', getSetting(settings.USERAGENT) || '')
 
+    // TODO: Conditionally enable
+    this.webview.setAttribute('plugins', 'true')
+
     let partition
     if (this.props.frame.get('isPrivate')) {
       partition = 'private-1'
