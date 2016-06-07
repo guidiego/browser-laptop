@@ -53,3 +53,6 @@ buildConfig.js
 rulesets.json
 httpse.json
 httpse.sqlite
+
+# Temporary for testing
+js/plugins
