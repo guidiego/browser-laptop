@@ -22,7 +22,6 @@ const FullScreenWarning = require('./fullScreenWarning')
 const debounce = require('../lib/debounce.js')
 const getSetting = require('../settings').getSetting
 const settings = require('../constants/settings')
-const adInfo = require('../data/adInfo.js')
 const FindBar = require('./findbar.js')
 const consoleStrings = require('../constants/console')
 const { aboutUrls, isSourceAboutUrl, isTargetAboutUrl, getTargetAboutUrl, getBaseUrl } = require('../lib/appUrlUtil')
@@ -441,12 +440,6 @@ class Frame extends ImmutableComponent {
           ipc.send(messages.CHECK_CERT_ERROR_ACCEPTED, parsedUrl.host, this.props.frame.get('key'))
         }
       }
-      if (this.props.enableFingerprintingProtection) {
-        this.webview.send(messages.BLOCK_CANVAS_FINGERPRINTING)
-      }
-      if (this.props.block3rdPartyStorage) {
-        this.webview.send(messages.BLOCK_THIRD_PARTY_STORAGE)
-      }
       windowActions.updateBackForwardState(
         this.props.frame,
         this.webview.canGoBack(),
@@ -456,15 +449,6 @@ class Frame extends ImmutableComponent {
       windowActions.onWebviewLoadEnd(
         this.props.frame,
         this.webview.getURL())
-
-      if (this.props.enableAds) {
-        this.insertAds(this.webview.getURL())
-      }
-      this.initSpellCheck()
-      this.webview.send(messages.POST_PAGE_LOAD_RUN)
-      if (getSetting(settings.PASSWORD_MANAGER_ENABLED)) {
-        this.webview.send(messages.AUTOFILL_PASSWORD)
-      }
 
       const parsedUrl = urlParse(this.props.frame.get('location'))
       const protocol = parsedUrl.protocol
@@ -603,22 +587,6 @@ class Frame extends ImmutableComponent {
     } else {
       return defaultMsg
     }
-  }
-
-  insertAds (currentLocation) {
-    var host = urlParse(currentLocation).hostname
-    if (!host) {
-      return
-    }
-    host = host.replace('www.', '')
-    const adDivCandidates = adInfo[host] || []
-    // Call this even when there are no matches because we have some logic
-    // to replace common divs.
-    this.webview.send(messages.SET_AD_DIV_CANDIDATES, adDivCandidates, config.vault.replacementUrl)
-  }
-
-  initSpellCheck () {
-    this.webview.send(messages.INIT_SPELL_CHECK, this.props.dictionaryLocale)
   }
 
   goBack () {

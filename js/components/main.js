@@ -418,28 +418,6 @@ class Main extends ImmutableComponent {
     windowActions.setReleaseNotesVisible(false)
   }
 
-  get enableAds () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (this.activeSiteSettings.get('adControl') !== undefined) {
-        if (['blockAds', 'allowAdsAndTracking'].includes(this.activeSiteSettings.get('adControl'))) {
-          return false
-        } else {
-          return true
-        }
-      }
-    }
-
-    let enabled = this.props.appState.getIn(['adInsertion', 'enabled'])
-    if (enabled === undefined) {
-      enabled = appConfig.adInsertion.enabled
-    }
-    return enabled
-  }
-
   get enableNoScript () {
     if (this.activeSiteSettings) {
       if (this.activeSiteSettings.get('shieldsUp') === false) {
@@ -455,39 +433,6 @@ class Main extends ImmutableComponent {
     if (enabled === undefined) {
       enabled = appConfig.noScript.enabled
     }
-    return enabled
-  }
-
-  get enableFingerprintingProtection () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof this.activeSiteSettings.get('fingerprintingProtection') === 'boolean') {
-        return this.activeSiteSettings.get('fingerprintingProtection')
-      }
-    }
-
-    return getSetting(settings.BLOCK_CANVAS_FINGERPRINTING) || false
-  }
-
-  get block3rdPartyStorage () {
-    if (this.activeSiteSettings) {
-      if (this.activeSiteSettings.get('shieldsUp') === false) {
-        return false
-      }
-
-      if (typeof this.activeSiteSettings.get('cookieControl') === 'string') {
-        return this.activeSiteSettings.get('cookieControl') === 'block3rdPartyCookie'
-      }
-    }
-
-    let enabled = this.props.appState.getIn(['cookieblock', 'enabled'])
-    if (typeof enabled !== 'boolean') {
-      enabled = appConfig.cookieblock.enabled
-    }
-
     return enabled
   }
 
@@ -821,14 +766,10 @@ class Main extends ImmutableComponent {
                     .filter((site) => site.get('tags')
                       .includes(siteTags.BOOKMARK_FOLDER)) || new Immutable.Map()
                 : null}
-              dictionaryLocale={this.props.appState.getIn(['dictionary', 'locale'])}
               passwords={this.props.appState.get('passwords')}
               allSiteSettings={allSiteSettings}
               activeSiteSettings={activeSiteSettings}
-              enableAds={this.enableAds}
               enableNoScript={this.enableNoScript}
-              enableFingerprintingProtection={this.enableFingerprintingProtection}
-              block3rdPartyStorage={this.block3rdPartyStorage}
               isPreview={frame.get('key') === this.props.windowState.get('previewFrameKey')}
               isActive={FrameStateUtil.isFrameKeyActive(this.props.windowState, frame.get('key'))}
             />)
